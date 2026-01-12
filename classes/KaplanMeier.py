@@ -74,3 +74,14 @@ class KaplanMeier:
             ).drop("prob_survive")
         )
 
+    def calc_hazard(self, df):
+        return (
+            df
+            .with_columns(
+                delta_time=pl.col("time") - pl.col("time").shift(1)
+            ).filter(pl.col("delta_time").is_not_null())
+            .with_columns(
+                h=(pl.col("m") / pl.col("n") / pl.col("delta_time"))
+            ).drop("delta_time")
+        )
+
