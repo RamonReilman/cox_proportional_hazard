@@ -9,6 +9,12 @@ class KaplanMeier:
 
 
     def fit(self, df):
+        """
+        Creates a dataframe that fits to given event and time data
+        This df will contain amount of people at risk at a time, that experience an event, and people who don't
+        :param df: df containing 'time' and 'censored' columns
+        :return:
+        """
         needed_columns = ["time", "censored"]
         try:
             for variable in needed_columns:
