@@ -2,8 +2,9 @@ from typing import Any
 
 import numpy as np
 import polars as pl
-
-
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.pyplot import xlabel
 
 
 class CoxProportionalHazard:
@@ -13,6 +14,7 @@ class CoxProportionalHazard:
         self._wanted_cov = None
         self._beta_values = []
         self.eps = np.finfo(np.float32).eps
+        self._result = pl.DataFrame()
 
     def fit(self, df, time_col, event_col):
         df = df.sort(time_col)
@@ -39,7 +41,41 @@ class CoxProportionalHazard:
             if np.all(np.abs(beta_delta) < self.eps):
                 break
             self._beta_values += beta_delta
-        return self._beta_values
+        return self.__create_resulting_dataframe()
+
+    def __create_resulting_dataframe(self):
+        self._result = pl.DataFrame({
+            "covariate": pl.Series(self._wanted_cov.columns),
+            "beta values": np.round(self._beta_values, 2),
+            "exp(beta)": np.round(np.exp(self._beta_values), 2)
+        })
+
+        return self._result
+
+    def __plot(self, ax):
+        if not self._result.is_empty():
+            plt.xlabel("Covariates")
+            plt.xticks(rotation=40)
+            for container in ax.containers:
+                ax.bar_label(container)
+            plt.show(ax)
+        else:
+            print("No model has been fit, yet!")
+
+    def plot_beta_value(self):
+        temp_data = self._result.sort("beta values")
+        ax = sns.barplot(x=temp_data["covariate"], y=np.round(temp_data["beta values"], 2), width=0.75,
+                         saturation=1)
+        ax.set(ylabel = "beta values", title = "Beta values for all covariates")
+        self.__plot(ax)
+
+    def plot_hazard_ratio(self):
+        temp_data = self._result.sort("beta values")
+        ax = sns.barplot(x=temp_data["covariate"], y=np.round(temp_data["exp(beta)"], 2), width=0.75, saturation=1)
+        ax.set(ylabel = "hazard ratio", title = "Hazard ratio for all covariates")
+        self.__plot(ax)
+
+
 
 
     def calculate_relative_risk(self,  risk_set) -> Any:
