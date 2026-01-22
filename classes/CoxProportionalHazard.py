@@ -72,7 +72,7 @@ class CoxProportionalHazard:
     def plot_hazard_ratio(self):
         temp_data = self._result.sort("beta values")
         ax = sns.barplot(x=temp_data["covariate"], y=np.round(temp_data["exp(beta)"], 2), width=0.75, saturation=1)
-        ax.set(ylabel = "hazard ratio", title = "Hazard ratio for all covariates")
+        ax.set(ylabel = "hazard ratio, exp(beta value)", title = "Hazard ratio for all covariates")
         self.__plot(ax)
 
 
