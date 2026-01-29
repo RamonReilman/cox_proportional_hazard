@@ -8,3 +8,6 @@ De implementaties zijn te vinden onder `classes`, het logboek is `cox_proportion
 
 De uitleg van de implementaties zijn vindbaar in de logboeken.
 
+
+## Requirements
+- python 3.12
